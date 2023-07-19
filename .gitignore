@@ -1,0 +1,127 @@
+# General
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Java
+*.class
+
+# Compiled files
+*.min.css
+*.min.js
+*.map
+
+# Build and Dependency directories
+/dist/
+/build/
+/bower_components/
+/vendor/
+
+# Log files
+*.log
+
+# Cache and temp files
+*.cache/
+*.tmp/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Compiled Python files
+*.pyc
+
+# macOS
+*.DS_Store
+
+# Thumbnails
+*.thumbnail/
+
+# Dependency lock files
+yarn.lock
+package-lock.json
+
+# Compiled WebAssembly files
+*.wasm
+
+# Media files
+*.mp4
+*.webm
+*.ogv
+*.flv
+*.avi
+*.wmv
+*.swf
+
+# Archive files
+*.zip
+*.tar
+*.gz
+
+# Database files
+*.sqlite
+*.db
+*.sqlite3
+
+# OS-specific files
+Icon?
+ehthumbs.db
+ehthumbs_vista.db
+
+# Webpack
+node_modules/
+/dist/
+
+# Gradle
+**/build/
+**/out/
+**/buildSrc/
+
+# Maven
+**/target/
+
+# IntelliJ
+.idea
+*.iml
+*.ipr
+*.iws
+*.log
+
+# Eclipse
+.settings/
+.classpath
+.project
+
+# Visual Studio
+.vs/
+*.sln
+*.suo
+*.user
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcproj
+
+# Xcode
+*.xcworkspace/
+*.xcodeproj/
+!*.xcodeproj/project.pbxproj
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Ignore specific files
+filename.extension
+
+# Ignore specific folders
+foldername/

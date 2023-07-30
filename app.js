@@ -1,8 +1,11 @@
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
-const Campground = require("./models/campground");
 const methodOverride = require("method-override");
+const morgan = require("morgan");
+const ejsMate = require("ejs-mate");
+const ExpressError = require("./utils/ExpressError");
+const campgroundsRoute = require("./routes/campgrounds");
 
 const app = express();
 const port = 3000;
@@ -14,72 +17,41 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
   console.log("Database connected");
 });
-
+/* app settings */
+app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
+app.use(morgan("dev"));
 
+/* ************************* */
+
+/* app get request */
 app.get("/", (req, res) => {
   res.render("home");
 });
 
-app.get("/campgrounds", async (req, res) => {
-  const campgrounds = await Campground.find({});
-  res.render("campgrounds/index", { campgrounds });
-});
+app.use("/campgrounds", campgroundsRoute);
 
-app.get("/campgrounds/new", (req, res) => {
-  res.render("campgrounds/new");
-});
+/* *********************************** */
 
-app.post("/campgrounds", async (req, res) => {
-  const campground = new Campground(req.body.campground);
-  await campground.save();
-  res.redirect(`/campgrounds/${campground._id}`);
-});
+/* app other request */
 
-app.get("/campgrounds/:id", async (req, res) => {
-  try {
-    const campground = await Campground.findById(req.params.id);
-    if (!campground) {
-      return res.status(404).send("Campground not found");
-    }
-    res.render("campgrounds/show", { campground });
-  } catch (error) {
-    console.error(err);
-    res.status(500).send("Internal Server Error");
-  }
+app.all("*", (req, res, next) => {
+  next(new ExpressError("Page Not Found", 404));
 });
+/* ****************** */
 
-app.get("/campgrounds/:id/edit", async (req, res) => {
-  try {
-    const campground = await Campground.findById(req.params.id);
-    if (!campground) {
-      return res.status(404).send("Campground not found");
-    }
-    res.render("campgrounds/edit", { campground });
-  } catch (error) {
-    console.error(err);
-    res.status(500).send("Internal Server Error");
-  }
+/* app error handller */
+app.use((err, req, res, next) => {
+  const { message = "somthing went wrong", status = 500 } = err;
+  res.status(status).render("error", { err });
 });
-
-app.put("/campgrounds/:id", async (req, res) => {
-  const { id } = req.params;
-  const campground = await Campground.findByIdAndUpdate(id, {
-    ...req.body.campground,
-  });
-  res.redirect(`/campgrounds/${campground._id}`);
-});
-
-app.delete("/campgrounds/:id", async (req, res) => {
-  const { id } = req.params;
-  await Campground.findByIdAndDelete(id);
-  res.redirect("/campgrounds");
-});
+/* *********************** */
 
 app.listen(port, () => {
   console.log(`Serving on port:${port}`);

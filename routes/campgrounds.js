@@ -1,12 +1,11 @@
 const express = require("express");
 const Campground = require("../models/campground");
-const Review = require("../models/review");
 const router = express.Router();
 const wrapAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/ExpressError");
 const validateCampground = require("../validators/validateCampground");
-const validateReview = require("../validators/validateReview");
 
+/* GET - campground/index route */
 router.get(
   "/",
   wrapAsync(async (req, res) => {
@@ -19,16 +18,19 @@ router.get(
   })
 );
 
+/* POST - creating a new campground route */
 router.post(
   "/",
   validateCampground,
   wrapAsync(async (req, res) => {
     const campground = new Campground(req.body.campground);
     await campground.save();
+    req.flash("success", "Created new campground successfully!");
     res.redirect(`/campgrounds/${campground._id}`);
   })
 );
 
+/* PUT - editing a campground route */
 router.put(
   "/:id",
   validateCampground,
@@ -41,10 +43,12 @@ router.put(
   })
 );
 
+/* GET - creating a campground */
 router.get("/new", (req, res) => {
   res.render("campgrounds/new");
 });
 
+/* GET - showing one campground route */
 router.get("/:id", async (req, res, next) => {
   try {
     const campground = await Campground.findById(req.params.id).populate(
@@ -56,6 +60,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+/* GET - edit a campground route */
 router.get(
   "/:id/edit",
   wrapAsync(async (req, res) => {
@@ -67,29 +72,7 @@ router.get(
   })
 );
 
-router.post(
-  "/:id/reviews",
-  validateReview,
-  wrapAsync(async (req, res, next) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`);
-  })
-);
-
-router.delete(
-  "/:id/reviews/:reviewId",
-  wrapAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-  })
-);
-
+/* DELETE - deleting a campground route */
 router.delete(
   "/:id",
   wrapAsync(async (req, res) => {

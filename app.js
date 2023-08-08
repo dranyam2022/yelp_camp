@@ -5,10 +5,16 @@ const methodOverride = require("method-override");
 const morgan = require("morgan");
 const ejsMate = require("ejs-mate");
 const ExpressError = require("./utils/ExpressError");
-const campgroundsRoute = require("./routes/campgrounds");
+const passport = require("passport");
+const localStrategy = require("passport-local");
 
+const flash = require("connect-flash");
+const session = require("express-session");
 const app = express();
 const port = 3000;
+
+const campgroundsRoute = require("./routes/campgrounds");
+const reviewsRoute = require("./routes/reviews");
 
 mongoose.connect("mongodb://127.0.0.1:27017/yelp-camp");
 
@@ -27,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(morgan("dev"));
+app.use(flash());
 
 /* ************************* */
 
@@ -35,7 +42,28 @@ app.get("/", (req, res) => {
   res.render("home");
 });
 
+const sessionConfig = {
+  secret: "thisshoullldbeabettersecret!",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 604800000,
+    maxAge: 604800000,
+  },
+};
+
+app.use(session(sessionConfig));
+
+/* flash middle-ware */
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
+
 app.use("/campgrounds", campgroundsRoute);
+app.use("/campgrounds/:id/reviews", reviewsRoute);
 
 /* *********************************** */
 

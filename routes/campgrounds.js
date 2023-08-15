@@ -4,6 +4,7 @@ const router = express.Router();
 const wrapAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/ExpressError");
 const validateCampground = require("../validators/validateCampground");
+const { isLoggedIn } = require("../middleware");
 
 /* GET - campground/index route */
 router.get(
@@ -21,6 +22,7 @@ router.get(
 /* POST - creating a new campground route */
 router.post(
   "/",
+  isLoggedIn,
   validateCampground,
   wrapAsync(async (req, res) => {
     const campground = new Campground(req.body.campground);
@@ -33,6 +35,7 @@ router.post(
 /* PUT - editing a campground route */
 router.put(
   "/:id",
+  isLoggedIn,
   validateCampground,
   wrapAsync(async (req, res) => {
     const { id } = req.params;
@@ -44,7 +47,7 @@ router.put(
 );
 
 /* GET - creating a campground */
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
   res.render("campgrounds/new");
 });
 
@@ -63,6 +66,7 @@ router.get("/:id", async (req, res, next) => {
 /* GET - edit a campground route */
 router.get(
   "/:id/edit",
+  isLoggedIn,
   wrapAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     if (!campground) {
@@ -75,6 +79,7 @@ router.get(
 /* DELETE - deleting a campground route */
 router.delete(
   "/:id",
+  isLoggedIn,
   wrapAsync(async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);

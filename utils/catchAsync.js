@@ -1,7 +1,7 @@
-const ExpressError = require("./ExpressError");
-
-module.exports = (func) => {
+module.exports = function (func) {
   return (req, res, next) => {
-    func(req, res, next).catch((err) => next(err));
+    func(req, res, next).catch((err) => {
+      next(err);
+    });
   };
 };

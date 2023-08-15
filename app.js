@@ -6,7 +6,9 @@ const morgan = require("morgan");
 const ejsMate = require("ejs-mate");
 const ExpressError = require("./utils/ExpressError");
 const passport = require("passport");
-const localStrategy = require("passport-local");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user");
+const usersRoute = require("./routes/users");
 
 const flash = require("connect-flash");
 const session = require("express-session");
@@ -37,11 +39,6 @@ app.use(flash());
 
 /* ************************* */
 
-/* app get request */
-app.get("/", (req, res) => {
-  res.render("home");
-});
-
 const sessionConfig = {
   secret: "thisshoullldbeabettersecret!",
   resave: false,
@@ -55,6 +52,13 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 /* flash middle-ware */
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
@@ -62,6 +66,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/", (req, res) => {
+  res.render("home");
+});
+
+app.use("/", usersRoute);
 app.use("/campgrounds", campgroundsRoute);
 app.use("/campgrounds/:id/reviews", reviewsRoute);
 

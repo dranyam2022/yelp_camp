@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/catchAsync");
+const multer = require("multer");
+const { storage } = require("../cloudinary");
+const upload = multer({ storage });
+
 /* requiring controllers */
 const {
   index,
@@ -18,11 +22,15 @@ const {
   validateCampgroundSchema,
 } = require("../middleware");
 
-/* GET - campground/index route */
 router
   .route("/")
   .get(wrapAsync(index))
-  .post(isLoggedIn, validateCampgroundSchema, wrapAsync(createNewCampground));
+  .post(
+    isLoggedIn,
+    upload.array("campground[image]"),
+    validateCampgroundSchema,
+    wrapAsync(createNewCampground)
+  );
 
 router.get("/new", isLoggedIn, renderNewForm);
 
@@ -32,14 +40,12 @@ router
   .put(
     isLoggedIn,
     isAuthor,
+    upload.array("campground[image]"),
     validateCampgroundSchema,
     wrapAsync(editCampground)
   )
   .delete(isLoggedIn, isAuthor, wrapAsync(deleteCampground));
 
-/* GET - edit a campground route */
 router.get("/:id/edit", isLoggedIn, isAuthor, wrapAsync(renderEditForm));
-
-
 
 module.exports = router;

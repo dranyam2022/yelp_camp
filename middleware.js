@@ -58,14 +58,20 @@ module.exports.validateReviewSchema = (req, res, next) => {
 };
 
 module.exports.validateCampgroundSchema = (req, res, next) => {
+  const imageSchema = Joi.object({
+    url: Joi.string().required(),
+    filename: Joi.string().required(),
+  });
+
   const campgroundSchema = Joi.object({
     campground: Joi.object({
       title: Joi.string().required(),
       description: Joi.string().required(),
       price: Joi.number().required().min(0),
-      image: Joi.string().required(),
+      image: Joi.array().items(imageSchema),
       location: Joi.string().required(),
     }).required(),
+    deleteImages: Joi.array(),
   });
 
   const { error } = campgroundSchema.validate(req.body);

@@ -8,6 +8,7 @@
       method="POST"
       novalidate
       class="validated-form"
+      enctype="multipart/form-data"
     >
       <div class="mb-3">
         <label class="form-label" for="title">Title</label>
@@ -31,16 +32,15 @@
           required
         />
       </div>
-      <div class="mb-3">
-        <label class="form-label" for="image">Image Url</label>
+      <div class="input-group mb-3">
         <input
-          class="form-control"
-          type="text"
-          id="image"
+          type="file"
           name="campground[image]"
-          value="<%= campground.image %>"
-          required
+          class="form-control"
+          id="image"
+          multiple
         />
+        <label class="input-group-text" for="image">Upload</label>
       </div>
       <div class="mb-3">
         <label class="form-label" for="description">Description</label>
@@ -70,7 +70,20 @@
           <span class="input-group-text">.00</span>
         </div>
       </div>
-
+      <div class="mb-3">
+        <% campground.images.forEach((img,i)=>{%>
+        <img src="<%= img.thumbnail %>" alt="" class="img-thumbnail" />
+        <div class="form-check-inline">
+          <input
+            type="checkbox"
+            name="deleteImages[]"
+            id="image-<%= i %>"
+            value="<%= img.filename %>"
+          />
+          <label for="image-<%= i %>">Delete?</label>
+        </div>
+        <% }) %>
+      </div>
       <div class="mb-3">
         <button class="btn btn-info" type="submit">Update campground</button>
       </div>
